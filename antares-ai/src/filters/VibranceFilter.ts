@@ -1,5 +1,4 @@
 import type { ImageFilter } from "./ImageFilter";
-
 import { transformOKLCH } from "../utils/color/";
 
 export class VibranceFilter implements ImageFilter {
@@ -7,37 +6,17 @@ export class VibranceFilter implements ImageFilter {
 
   apply(imageData: ImageData): ImageData {
     const data = imageData.data;
-
     const strength = this.amount / 100;
 
     const MAX_CHROMA = 0.4;
-
     const SCALE = 0.08;
 
     for (let i = 0; i < data.length; i += 4) {
       const rgb = transformOKLCH(
-        {
-          r: data[i],
-          g: data[i + 1],
-          b: data[i + 2],
-        },
+        { r: data[i], g: data[i + 1], b: data[i + 2] },
         (lch) => {
-          const boost =
-            1 -
-            Math.min(
-              lch.c / MAX_CHROMA,
-              1
-            );
-
-          lch.c +=
-            strength *
-            boost *
-            SCALE;
-
-          lch.c = Math.max(
-            0,
-            lch.c
-          );
+          const boost = 1 - Math.min(lch.c / MAX_CHROMA, 1);
+          lch.c = Math.max(0, lch.c + strength * boost * SCALE);
         }
       );
 
