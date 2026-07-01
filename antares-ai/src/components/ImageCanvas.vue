@@ -3,12 +3,15 @@ import { ref } from "vue";
 
 const props = defineProps<{
   vibrance: number;
+  highlightsShadows: number;
 }>();
 
 const emit = defineEmits<{
   "update:vibrance": [value: number];
+  "update:highlightsShadows": [value: number];
   "update:canvasEl": [el: HTMLCanvasElement | null];
   "vibrance-input": [];
+  "highlights-shadows-input": [];
 }>();
 
 const showControls = ref(false);
@@ -18,6 +21,12 @@ function onVibranceChange(event: Event) {
   const input = event.target as HTMLInputElement;
   emit("update:vibrance", Number(input.value));
   emit("vibrance-input");
+}
+
+function onHighlightsShadowsChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  emit("update:highlightsShadows", Number(input.value));
+  emit("highlights-shadows-input");
 }
 
 function onPointerDown() {
@@ -46,22 +55,42 @@ function onPointerUp() {
         showControls && !dragging ? 'opacity-100' : 'opacity-0 pointer-events-none',
       ]"
     >
-      <div class="w-80">
-        <input
-          :value="vibrance"
-          type="range"
-          min="-100"
-          max="100"
-          class="w-full accent-black"
-          @input="onVibranceChange"
-          @pointerdown="onPointerDown"
-          @pointerup="onPointerUp"
-          @pointercancel="onPointerUp"
-        />
+      <div class="w-80 space-y-5 rounded-xl bg-white/90 p-4 shadow-lg ring-1 ring-black/5 backdrop-blur">
+        <div>
+          <input
+            :value="highlightsShadows"
+            type="range"
+            min="-100"
+            max="100"
+            class="w-full accent-black"
+            @input="onHighlightsShadowsChange"
+            @pointerdown="onPointerDown"
+            @pointerup="onPointerUp"
+            @pointercancel="onPointerUp"
+          />
 
-        <p class="mt-2 text-center text-sm text-neutral-500">
-          Vibrance {{ vibrance }}
-        </p>
+          <p class="mt-2 text-center text-sm text-neutral-500">
+            Highlights & Shadows {{ highlightsShadows }}
+          </p>
+        </div>
+
+        <div>
+          <input
+            :value="vibrance"
+            type="range"
+            min="-100"
+            max="100"
+            class="w-full accent-black"
+            @input="onVibranceChange"
+            @pointerdown="onPointerDown"
+            @pointerup="onPointerUp"
+            @pointercancel="onPointerUp"
+          />
+
+          <p class="mt-2 text-center text-sm text-neutral-500">
+            Vibrance {{ vibrance }}
+          </p>
+        </div>
       </div>
     </div>
   </div>

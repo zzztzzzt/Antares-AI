@@ -6,7 +6,13 @@ import ImageCanvas from "./components/ImageCanvas.vue";
 import { useImageEditor } from "./composables/useImageEditor";
 
 const canvasEl = ref<HTMLCanvasElement | null>(null);
-const { vibrance, openImage, onVibranceInput } = useImageEditor(canvasEl);
+const {
+  vibrance,
+  highlightsShadows,
+  openImage,
+  onVibranceInput,
+  onHighlightsShadowsInput,
+} = useImageEditor(canvasEl);
 </script>
 
 <template>
@@ -28,8 +34,10 @@ const { vibrance, openImage, onVibranceInput } = useImageEditor(canvasEl);
 
       <ImageCanvas
         v-model:vibrance="vibrance"
+        v-model:highlightsShadows="highlightsShadows"
         v-model:canvasEl="canvasEl"
         @vibrance-input="onVibranceInput"
+        @highlights-shadows-input="onHighlightsShadowsInput"
       />
     </div>
   </main>

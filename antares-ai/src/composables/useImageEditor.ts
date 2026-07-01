@@ -2,6 +2,7 @@ import { ref } from "vue";
 import type { Ref } from "vue";
 
 import { CanvasEngine } from "../core/CanvasEngine";
+import { HighlightsShadowsFilter } from "../filters/HighlightsShadowsFilter";
 import { VibranceFilter } from "../filters/VibranceFilter";
 import type { ImageFilter } from "../filters/ImageFilter";
 
@@ -14,15 +15,18 @@ function cloneImageData(imageData: ImageData): ImageData {
 }
 
 export function useImageEditor(canvasRef: Ref<HTMLCanvasElement | null>) {
-  const vibrance = ref(60);
+  const vibrance = ref(0);
+  const highlightsShadows = ref(0);
 
   let engine: CanvasEngine | null = null;
   let originalImageData: ImageData | null = null;
 
   const vibranceFilter = new VibranceFilter();
+  const highlightsShadowsFilter = new HighlightsShadowsFilter();
   vibranceFilter.amount = vibrance.value;
+  highlightsShadowsFilter.amount = highlightsShadows.value;
 
-  const filters: ImageFilter[] = [vibranceFilter];
+  const filters: ImageFilter[] = [highlightsShadowsFilter, vibranceFilter];
 
   function render() {
     if (!engine || !originalImageData) return;
@@ -38,6 +42,11 @@ export function useImageEditor(canvasRef: Ref<HTMLCanvasElement | null>) {
 
   function onVibranceInput() {
     vibranceFilter.amount = vibrance.value;
+    render();
+  }
+
+  function onHighlightsShadowsInput() {
+    highlightsShadowsFilter.amount = highlightsShadows.value;
     render();
   }
 
@@ -68,5 +77,5 @@ export function useImageEditor(canvasRef: Ref<HTMLCanvasElement | null>) {
     reader.readAsDataURL(file);
   }
 
-  return { vibrance, openImage, onVibranceInput };
+  return { vibrance, highlightsShadows, openImage, onVibranceInput, onHighlightsShadowsInput };
 }
