@@ -57,7 +57,7 @@ function toggleMode() {
       <!-- Performance Indicator -->
       <div class="mb-4 text-center text-sm text-gray-600">
         <span v-if="useWasm">
-          Using Rust WASM for Vibrance filter
+          Using Rust WASM for all filters
         </span>
         <span v-else>
           Using TypeScript for all filters
