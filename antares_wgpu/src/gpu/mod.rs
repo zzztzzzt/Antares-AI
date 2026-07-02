@@ -1,9 +1,11 @@
+mod duotone;
 mod highlights_shadows;
 mod temperature_tint;
 mod vibrance;
 
 use std::cell::RefCell;
 
+pub use duotone::DuotonePipeline;
 pub use highlights_shadows::HighlightsShadowsPipeline;
 pub use temperature_tint::TemperatureTintPipeline;
 pub use vibrance::VibrancePipeline;
@@ -18,6 +20,7 @@ pub struct GpuState {
     pub vibrance: VibrancePipeline,
     pub highlights_shadows: HighlightsShadowsPipeline,
     pub temperature_tint: TemperatureTintPipeline,
+    pub duotone: DuotonePipeline,
 }
 
 pub async fn init() -> Result<(), String> {
@@ -48,6 +51,7 @@ pub async fn init() -> Result<(), String> {
     let vibrance = VibrancePipeline::new(&device);
     let highlights_shadows = HighlightsShadowsPipeline::new(&device);
     let temperature_tint = TemperatureTintPipeline::new(&device);
+    let duotone = DuotonePipeline::new(&device);
 
     GPU_STATE.with(|state| {
         *state.borrow_mut() = Some(GpuState {
@@ -56,6 +60,7 @@ pub async fn init() -> Result<(), String> {
             vibrance,
             highlights_shadows,
             temperature_tint,
+            duotone,
         });
     });
 

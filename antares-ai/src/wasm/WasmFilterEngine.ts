@@ -1,4 +1,4 @@
-import init, { applyVibranceFilter, applyHighlightsShadowsFilter, applyTemperatureTintFilter, initFilterEngine } from '../../../antares_wgpu/pkg/antares_wgpu.js';
+import init, { applyVibranceFilter, applyHighlightsShadowsFilter, applyTemperatureTintFilter, applyDuotoneFilter, initFilterEngine } from '../../../antares_wgpu/pkg/antares_wgpu.js';
 import wasmUrl from '../../../antares_wgpu/pkg/antares_wgpu_bg.wasm?url';
 
 /**
@@ -49,6 +49,32 @@ export class WasmFilterEngine {
   async applyTemperatureTint(imageData: ImageData, temperature: number, tint: number): Promise<void> {
     this.ensureInitialized();
     await applyTemperatureTintFilter(imageData.data, imageData.width, imageData.height, temperature, tint);
+  }
+
+  /**
+   * Apply duotone filter via WGPU compute shader
+   * @param imageData - ImageData from canvas context
+   * @param amount - Amount (0 to 100)
+   * @param contrastCurve - Contrast curve mapping (e.g. 0.82)
+   * @param dr - Dark color R (0 to 255)
+   * @param dg - Dark color G (0 to 255)
+   * @param db - Dark color B (0 to 255)
+   * @param lr - Light color R (0 to 255)
+   * @param lg - Light color G (0 to 255)
+   * @param lb - Light color B (0 to 255)
+   */
+  async applyDuotone(
+    imageData: ImageData, 
+    amount: number, 
+    contrastCurve: number, 
+    dr: number, dg: number, db: number,
+    lr: number, lg: number, lb: number
+  ): Promise<void> {
+    this.ensureInitialized();
+    await applyDuotoneFilter(
+      imageData.data, imageData.width, imageData.height, 
+      amount, contrastCurve, dr, dg, db, lr, lg, lb
+    );
   }
 
   private ensureInitialized(): void {
