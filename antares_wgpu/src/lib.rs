@@ -2,7 +2,6 @@ use wasm_bindgen::prelude::*;
 
 mod filters;
 mod gpu;
-mod utils;
 
 use filters::apply_vibrance;
 

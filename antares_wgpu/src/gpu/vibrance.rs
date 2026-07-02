@@ -18,9 +18,14 @@ pub struct VibrancePipeline {
 
 impl VibrancePipeline {
     pub fn new(device: &wgpu::Device) -> Self {
+        // Load common color functions and vibrance-specific shader
+        let color_common = include_str!("../shaders/common/color.wgsl");
+        let vibrance_shader = include_str!("../shaders/vibrance.wgsl");
+        let shader_source = format!("{}\n\n{}", color_common, vibrance_shader);
+
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("vibrance_shader"),
-            source: wgpu::ShaderSource::Wgsl(include_str!("../shaders/vibrance.wgsl").into()),
+            source: wgpu::ShaderSource::Wgsl(shader_source.into()),
         });
 
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
