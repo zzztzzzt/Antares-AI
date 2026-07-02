@@ -12,7 +12,7 @@ export class VibranceFilterWasm implements ImageFilter {
 
   async apply(imageData: ImageData): Promise<ImageData> {
     const engine = await getWasmFilterEngine();
-    engine.applyVibrance(imageData, this.amount);
+    await engine.applyVibrance(imageData, this.amount);
     return imageData;
   }
 }

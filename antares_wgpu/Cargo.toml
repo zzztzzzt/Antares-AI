@@ -11,6 +11,15 @@ wasm-opt = false
 
 [dependencies]
 wasm-bindgen = "0.2.126"
+wasm-bindgen-futures = "0.4.56"
+futures-channel = "0.3.31"
+bytemuck = { version = "1.24.0", features = ["derive"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wgpu = { version = "30.0.0", default-features = false, features = ["wgsl", "webgpu"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+wgpu = { version = "30.0.0", default-features = false, features = ["wgsl", "vulkan", "metal", "dx12"] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.76"

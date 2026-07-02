@@ -1,32 +1,33 @@
-import init, { applyVibranceFilter } from '../../../antares_wgpu/pkg/antares_wgpu.js';
+import init, { applyVibranceFilter, initFilterEngine } from '../../../antares_wgpu/pkg/antares_wgpu.js';
 import wasmUrl from '../../../antares_wgpu/pkg/antares_wgpu_bg.wasm?url';
 
 /**
- * WASM-based filter engine for high-performance image processing
+ * WGPU-based filter engine for high-performance image processing
  */
 export class WasmFilterEngine {
   private initialized = false;
 
   /**
-   * Initialize the WASM module
+   * Initialize the WASM module and WebGPU pipelines
    * Must be called before using any filters
    */
   async init(): Promise<void> {
     if (this.initialized) return;
-    
+
     await init(wasmUrl);
+    await initFilterEngine();
     this.initialized = true;
-    console.log('WASM Filter Engine initialized');
+    console.log('WGPU Filter Engine initialized');
   }
 
   /**
-   * Apply vibrance filter
+   * Apply vibrance filter via WGPU compute shader
    * @param imageData - ImageData from canvas context
    * @param amount - Vibrance amount ( -100 to +100 )
    */
-  applyVibrance(imageData: ImageData, amount: number): void {
+  async applyVibrance(imageData: ImageData, amount: number): Promise<void> {
     this.ensureInitialized();
-    applyVibranceFilter(imageData.data, imageData.width, imageData.height, amount);
+    await applyVibranceFilter(imageData.data, imageData.width, imageData.height, amount);
   }
 
   private ensureInitialized(): void {
