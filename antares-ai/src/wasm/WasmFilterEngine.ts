@@ -2,6 +2,14 @@ import init, { applyVibranceFilter, applyHighlightsShadowsFilter, applyTemperatu
 import wasmUrl from '../../../antares_wgpu/pkg/antares_wgpu_bg.wasm?url';
 
 /**
+ * Convert a Uint8ClampedArray ( e.g. from ImageData.data ) into a Uint8Array
+ * view over the same underlying buffer, without copying the data.
+ */
+function toUint8Array(data: Uint8ClampedArray): Uint8Array {
+  return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+}
+
+/**
  * WGPU-based filter engine for high-performance image processing
  */
 export class WasmFilterEngine {
@@ -27,7 +35,7 @@ export class WasmFilterEngine {
    */
   async applyVibrance(imageData: ImageData, amount: number): Promise<void> {
     this.ensureInitialized();
-    await applyVibranceFilter(imageData.data, imageData.width, imageData.height, amount);
+    await applyVibranceFilter(toUint8Array(imageData.data), imageData.width, imageData.height, amount);
   }
 
   /**
@@ -37,7 +45,7 @@ export class WasmFilterEngine {
    */
   async applyHighlightsShadows(imageData: ImageData, amount: number): Promise<void> {
     this.ensureInitialized();
-    await applyHighlightsShadowsFilter(imageData.data, imageData.width, imageData.height, amount);
+    await applyHighlightsShadowsFilter(toUint8Array(imageData.data), imageData.width, imageData.height, amount);
   }
 
   /**
@@ -48,7 +56,7 @@ export class WasmFilterEngine {
    */
   async applyTemperatureTint(imageData: ImageData, temperature: number, tint: number): Promise<void> {
     this.ensureInitialized();
-    await applyTemperatureTintFilter(imageData.data, imageData.width, imageData.height, temperature, tint);
+    await applyTemperatureTintFilter(toUint8Array(imageData.data), imageData.width, imageData.height, temperature, tint);
   }
 
   /**
@@ -72,7 +80,7 @@ export class WasmFilterEngine {
   ): Promise<void> {
     this.ensureInitialized();
     await applyDuotoneFilter(
-      imageData.data, imageData.width, imageData.height, 
+      toUint8Array(imageData.data), imageData.width, imageData.height, 
       amount, contrastCurve, dr, dg, db, lr, lg, lb
     );
   }

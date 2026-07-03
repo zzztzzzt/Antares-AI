@@ -1,4 +1,3 @@
-import type { ImageFilter } from "./ImageFilter";
 import { getWasmFilterEngine } from "../wasm/WasmFilterEngine";
 
 /**
@@ -7,7 +6,7 @@ import { getWasmFilterEngine } from "../wasm/WasmFilterEngine";
  * Drop-in replacement for the TypeScript VibranceFilter
  * Uses Rust + WASM for significantly better performance
  */
-export class VibranceFilterWasm implements ImageFilter {
+export class VibranceFilterWasm {
   amount = 0; // Range : -100 to +100
 
   async apply(imageData: ImageData): Promise<ImageData> {

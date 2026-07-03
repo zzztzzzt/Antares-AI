@@ -1,4 +1,3 @@
-import type { ImageFilter } from "./ImageFilter";
 import { getWasmFilterEngine } from "../wasm/WasmFilterEngine";
 
 /**
@@ -7,7 +6,7 @@ import { getWasmFilterEngine } from "../wasm/WasmFilterEngine";
  * Drop-in replacement for the TypeScript DuotoneFilter
  * Uses Rust + WASM for significantly better performance
  */
-export class DuotoneFilterWasm implements ImageFilter {
+export class DuotoneFilterWasm {
   amount = 100;
   contrastCurve = 0.82;
 
