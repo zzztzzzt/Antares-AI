@@ -2,11 +2,10 @@ import { ref } from "vue";
 import type { Ref } from "vue";
 
 import { CanvasEngine } from "../core/CanvasEngine";
-import { DuotoneFilter } from "../filters/DuotoneFilter";
-import { HighlightsShadowsFilter } from "../filters/HighlightsShadowsFilter";
-import { TemperatureTintFilter } from "../filters/TemperatureTintFilter";
+import { DuotoneFilterWasm } from "../filters/DuotoneFilterWasm";
+import { HighlightsShadowsFilterWasm } from "../filters/HighlightsShadowsFilterWasm";
+import { TemperatureTintFilterWasm } from "../filters/TemperatureTintFilterWasm";
 import { VibranceFilterWasm } from "../filters/VibranceFilterWasm";
-import type { ImageFilter } from "../filters/ImageFilter";
 import { getWasmFilterEngine } from "../wasm/WasmFilterEngine";
 
 type RGBColor = { r: number; g: number; b: number };
@@ -43,10 +42,10 @@ export function useImageEditorWasm(canvasRef: Ref<HTMLCanvasElement | null>) {
   let originalImageData: ImageData | null = null;
   let wasmInitialized = false;
 
-  const temperatureTintFilter = new TemperatureTintFilter();
+  const temperatureTintFilter = new TemperatureTintFilterWasm();
   const vibranceFilter = new VibranceFilterWasm();
-  const highlightsShadowsFilter = new HighlightsShadowsFilter();
-  const duotoneFilter = new DuotoneFilter();
+  const highlightsShadowsFilter = new HighlightsShadowsFilterWasm();
+  const duotoneFilter = new DuotoneFilterWasm();
   
   temperatureTintFilter.temperature = temperature.value;
   temperatureTintFilter.tint = tint.value;
@@ -62,7 +61,7 @@ export function useImageEditorWasm(canvasRef: Ref<HTMLCanvasElement | null>) {
   (async () => {
     await getWasmFilterEngine();
     wasmInitialized = true;
-    console.log('WASM engine ready for Vibrance filter');
+    console.log('WASM engine ready for filters');
   })();
 
   async function render() {
@@ -70,15 +69,11 @@ export function useImageEditorWasm(canvasRef: Ref<HTMLCanvasElement | null>) {
 
     const image = cloneImageData(originalImageData);
 
-    // Apply TS filters
-    temperatureTintFilter.apply(image);
-    highlightsShadowsFilter.apply(image);
-    
-    // Apply WASM filter ( async )
+    // Apply WASM filters
+    await temperatureTintFilter.apply(image);
+    await highlightsShadowsFilter.apply(image);
     await vibranceFilter.apply(image);
-    
-    // Apply remaining TS filters
-    duotoneFilter.apply(image);
+    await duotoneFilter.apply(image);
 
     engine.putImageData(image);
   }
