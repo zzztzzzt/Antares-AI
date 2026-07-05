@@ -68,7 +68,7 @@ npm run dev
 go to `/antares_core`
 
 ```shell
-uv sync
+python -m uv sync
 ```
 
 ```shell
