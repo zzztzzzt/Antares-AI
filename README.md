@@ -61,6 +61,8 @@ example ( $yourpassword = your PostgreSQL password ) :
 DATABASE_URL=postgresql+asyncpg://postgres:yourpassword@localhost:5432/antares_db
 ```
 
+create db for Antares
+
 ```shell
 psql -U postgres -c "CREATE DATABASE antares_db"
 ```
