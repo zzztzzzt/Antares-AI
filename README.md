@@ -44,7 +44,42 @@ install Python : [https://www.python.org/downloads/](https://www.python.org/down
 
 Install uv : `python -m pip install --upgrade pip` => `python -m pip install uv`
 
-### step 1. Setup Photo Editor ( Frontend )
+Install PostgreSQL : [https://www.postgresql.org/](https://www.postgresql.org/)
+
+### Step 1. Setup Database
+
+at `/antares_core`
+
+```shell
+python -m uv sync
+```
+
+create `.env` at `antares_core\.env`
+
+example ( $yourpassword = your PostgreSQL password )
+```
+DATABASE_URL=postgresql+asyncpg://postgres:yourpassword@localhost:5432/antares_db
+```
+
+```shell
+psql -U postgres -c "CREATE DATABASE antares_db"
+```
+
+at `/antares_core`, compelete migration :
+
+```shell
+python -m uv run alembic upgrade head
+```
+
+### Step 2. Setup Backend AI Training
+
+at `/antares_core`
+
+```shell
+python -m uv run uvicorn main:app --reload --port 8000
+```
+
+### Step 3. Setup Photo Editor ( Frontend )
 
 go to `/antares_wgpu`, run below
 
@@ -69,16 +104,12 @@ npm install
 npm run dev
 ```
 
-### step 2. Setup Backend AI Training
+## Project Detail / Debug
 
-go to `/antares_core`
-
-```shell
-python -m uv sync
-```
+### Create new migration via Alembic
 
 ```shell
-python -m uv run uvicorn main:app --reload --port 8000
+python -m uv run alembic revision --autogenerate -m "your migration discriptions here"
 ```
 
 ## Project Dependencies Details
