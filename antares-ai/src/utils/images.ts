@@ -22,41 +22,81 @@ export function saveCanvasAsImage(
   }, 'image/png');
 }
 
-export function analyzeCanvasImage(canvas: HTMLCanvasElement | null) {
-  if (!canvas) {
-    console.log('No canvas image to analyze');
-    return;
+export interface AnalyzeImageResult {
+  status: string;
+  image_id: number;
+  filename: string;
+  size: number;
+  dimensions: { width: number; height: number };
+  features: Record<string, unknown>;
+}
+
+// Upload the ORIGINAL file for feature analysis.
+export async function analyzeOriginalImage(
+  file: File
+): Promise<AnalyzeImageResult | null> {
+  const formData = new FormData();
+  formData.append('file', file, file.name);
+
+  try {
+    console.log('Sending original image to backend analysis ...');
+
+    const response = await fetch('http://localhost:8000/training-images', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error ! Status code : ${response.status}, Content : ${errorText}`);
+    }
+
+    const aiData = await response.json();
+    console.log('Analysis successful :', aiData);
+    return aiData;
+  } catch (error) {
+    console.error('Image transmission or parsing failed :', error);
+    return null;
   }
+}
 
-  canvas.toBlob(async (blob) => {
-    if (!blob) {
-      console.log('Failed to generate blob from canvas');
-      return;
-    }
+export interface FilterDataPayload {
+  brightness: number;
+  vibrance: number;
+  highlights_shadows: number;
+  temperature: number;
+  tint: number;
+  duotone: number;
+  duotone_dark: string;
+  duotone_light: string;
+}
 
-    const formData = new FormData();
-    // 'file' must correspond to the parameter name in the backend FastAPI
-    formData.append('file', blob, `canvas-image-${Date.now()}.png`);
+export async function saveFilterData(
+  imageId: number,
+  filterData: FilterDataPayload
+) {
+  try {
+    console.log(`Saving filter data for image ${imageId} ...`);
 
-    try {
-      console.log('Sending images to backend analysis ...');
-
-      const response = await fetch('http://localhost:8000/training-images', {
-        method: 'POST',
-        body: formData, // Do not manually set the Content-Type; let the browser automatically add the multipart boundary
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error ! Status code : ${response.status}, Content : ${errorText}`);
+    const response = await fetch(
+      `http://localhost:8000/images/${imageId}/filter-data`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(filterData),
       }
+    );
 
-      const aiData = await response.json();
-      console.log('Analysis successful :', aiData);
-      return aiData;
-
-    } catch (error) {
-      console.error('Image transmission or parsing failed :', error);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error ! Status code : ${response.status}, Content : ${errorText}`);
     }
-  }, 'image/png');
+
+    const data = await response.json();
+    console.log('Filter data saved :', data);
+    return data;
+  } catch (error) {
+    console.error('Filter data transmission failed :', error);
+    return null;
+  }
 }

@@ -110,6 +110,8 @@ npm run dev
 
 ### Create new migration via Alembic
 
+at `/antares_core`
+
 ```shell
 python -m uv run alembic revision --autogenerate -m "your migration discriptions here"
 ```

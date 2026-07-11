@@ -8,6 +8,7 @@ import io
 from database import engine, Base, get_db
 from models import Image, ImageFeature
 from features.image_analyzer import ImageAnalyzer
+from routers.filter_data import router as filter_data_router
 
 
 @asynccontextmanager
@@ -31,6 +32,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(filter_data_router)
 
 analyzer = ImageAnalyzer()
 

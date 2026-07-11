@@ -40,6 +40,10 @@ export function useImageEditorWasm(canvasRef: Ref<HTMLCanvasElement | null>) {
   const duotoneDark = ref("#000000");
   const duotoneLight = ref("#ffffff");
 
+  // Save the original file and the image_id obtained after backend analysis
+  const originalFile = ref<File | null>(null);
+  const imageId = ref<number | null>(null);
+
   let engine: CanvasEngine | null = null;
   let originalImageData: ImageData | null = null;
   let wasmInitialized = false;
@@ -134,6 +138,11 @@ export function useImageEditorWasm(canvasRef: Ref<HTMLCanvasElement | null>) {
     if (!input.files?.length) return;
 
     const file = input.files[0];
+
+    // Replace with a new image : Save the original file and reset the image_id ( not yet analyzed )
+    originalFile.value = file;
+    imageId.value = null;
+
     const reader = new FileReader();
 
     reader.onload = () => {
@@ -165,6 +174,8 @@ export function useImageEditorWasm(canvasRef: Ref<HTMLCanvasElement | null>) {
     duotone,
     duotoneDark,
     duotoneLight,
+    originalFile,
+    imageId,
     openImage,
     onBrightnessInput,
     onVibranceInput,

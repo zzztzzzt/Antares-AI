@@ -5,15 +5,45 @@ import AppHeader from "./components/AppHeader.vue";
 import ImageCanvas from "./components/ImageCanvas.vue";
 
 import { useImageEditorWasm } from "./composables/useImageEditorWasm";
-import { saveCanvasAsImage, analyzeCanvasImage } from "./utils/images";
+import { saveCanvasAsImage, analyzeOriginalImage, saveFilterData } from "./utils/images";
 
 const canvasWasmEl = ref<HTMLCanvasElement | null>(null);
 
-// WASM version
 const wasmEditor = useImageEditorWasm(canvasWasmEl);
 
 const activeEditor = () => wasmEditor;
 
+async function storeImageData() {
+  const editor = activeEditor();
+
+  // The original image will be uploaded for analysis only on the first click
+  if (editor.imageId.value === null) {
+    if (!editor.originalFile.value) {
+      console.log("No original image file to analyze");
+      return;
+    }
+
+    const analysisResult = await analyzeOriginalImage(editor.originalFile.value);
+
+    if (!analysisResult?.image_id) {
+      console.log("Image analysis failed, aborting filter data save");
+      return;
+    }
+
+    editor.imageId.value = analysisResult.image_id;
+  }
+
+  await saveFilterData(editor.imageId.value, {
+    brightness: editor.brightness.value,
+    vibrance: editor.vibrance.value,
+    highlights_shadows: editor.highlightsShadows.value,
+    temperature: editor.temperature.value,
+    tint: editor.tint.value,
+    duotone: editor.duotone.value,
+    duotone_dark: editor.duotoneDark.value,
+    duotone_light: editor.duotoneLight.value,
+  });
+}
 </script>
 
 <template>
@@ -31,7 +61,7 @@ const activeEditor = () => wasmEditor;
             @change="activeEditor().openImage"
           />
         </label>
-        
+
         <button
           class="cursor-pointer rounded border border-neutral-300 px-4 py-2 transition hover:bg-neutral-50 duration-200"
           @click="saveCanvasAsImage(canvasWasmEl)"
@@ -41,7 +71,7 @@ const activeEditor = () => wasmEditor;
 
         <button
           class="cursor-pointer rounded border border-neutral-300 px-4 py-2 transition hover:bg-neutral-50 duration-200"
-          @click="analyzeCanvasImage(canvasWasmEl)"
+          @click="storeImageData"
         >
           Store Img Data
         </button>
