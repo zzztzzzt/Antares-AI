@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./api";
+
 export function saveCanvasAsImage(
   canvas: HTMLCanvasElement | null,
   filename = `antares-edited-${Date.now()}.png`
@@ -41,7 +43,7 @@ export async function analyzeOriginalImage(
   try {
     console.log('Sending original image to backend analysis ...');
 
-    const response = await fetch('http://localhost:8000/training-images', {
+    const response = await fetch(`${API_BASE_URL}/training-images`, {
       method: 'POST',
       body: formData,
     });
@@ -79,7 +81,7 @@ export async function saveFilterData(
     console.log(`Saving filter data for image ${imageId} ...`);
 
     const response = await fetch(
-      `http://localhost:8000/images/${imageId}/filter-data`,
+      `${API_BASE_URL}/images/${imageId}/filter-data`,
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
