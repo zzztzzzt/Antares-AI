@@ -58,10 +58,8 @@ const imageRows = ref<ImageRow[]>([]);
 const featureRows = ref<ImageFeatureRow[]>([]);
 const filterRows = ref<UserFilterRow[]>([]);
 const focusedImageId = ref<number | null>(null);
-const focusConfirm = reactive<Record<number, boolean>>({});
 const deleteConfirm = reactive<Record<number, boolean>>({});
 const deleteResetTimers = new Map<number, ReturnType<typeof setTimeout>>();
-const focusResetTimers = new Map<number, ReturnType<typeof setTimeout>>();
 const loading = ref(false);
 const errorMessage = ref("");
 const focusedImageRows = computed(() =>
@@ -101,16 +99,9 @@ async function loadAll() {
     imageRows.value = images;
     featureRows.value = features;
     filterRows.value = filters;
-    for (const key of Object.keys(focusConfirm)) {
-      delete focusConfirm[Number(key)];
-    }
     for (const key of Object.keys(deleteConfirm)) {
       delete deleteConfirm[Number(key)];
     }
-    for (const timer of focusResetTimers.values()) {
-      clearTimeout(timer);
-    }
-    focusResetTimers.clear();
     for (const timer of deleteResetTimers.values()) {
       clearTimeout(timer);
     }
@@ -122,50 +113,8 @@ async function loadAll() {
   }
 }
 
-async function focusImage(row: ImageRow) {
-  if (focusedImageId.value === row.id && focusConfirm[row.id]) {
-    focusedImageId.value = null;
-    delete focusConfirm[row.id];
-
-    const timer = focusResetTimers.get(row.id);
-    if (timer) {
-      clearTimeout(timer);
-      focusResetTimers.delete(row.id);
-    }
-    return;
-  }
-
-  if (focusedImageId.value === row.id) {
-    focusConfirm[row.id] = true;
-
-    const existingTimer = focusResetTimers.get(row.id);
-    if (existingTimer) {
-      clearTimeout(existingTimer);
-    }
-
-    const timer = setTimeout(() => {
-      delete focusConfirm[row.id];
-      focusResetTimers.delete(row.id);
-    }, 5000);
-
-    focusResetTimers.set(row.id, timer);
-    return;
-  }
-
-  focusedImageId.value = row.id;
-  focusConfirm[row.id] = true;
-
-  const existingTimer = focusResetTimers.get(row.id);
-  if (existingTimer) {
-    clearTimeout(existingTimer);
-  }
-
-  const timer = setTimeout(() => {
-    delete focusConfirm[row.id];
-    focusResetTimers.delete(row.id);
-  }, 5000);
-
-  focusResetTimers.set(row.id, timer);
+function focusImage({ id }: ImageRow) {
+  focusedImageId.value = focusedImageId.value === id ? null : id;
 }
 
 function armDeleteConfirm(imageId: number) {
@@ -280,7 +229,7 @@ onMounted(loadAll);
                       class="rounded border border-neutral-300 px-2.5 py-1 text-[11px] text-neutral-500 transition hover:border-sky-400 hover:text-sky-600"
                       @click="focusImage(row)"
                     >
-                      {{ focusConfirm[row.id] && focusedImageId === row.id ? "cancel" : "focus" }}
+                      {{ focusedImageId === row.id ? "cancel" : "focus" }}
                     </button>
                     <button
                       class="rounded border px-2.5 py-1 text-[11px] transition"
